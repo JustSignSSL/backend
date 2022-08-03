@@ -1,0 +1,1 @@
+export default () => Buffer.from(new Date().getTime().toString()).toString("base64").replace("=", "")
