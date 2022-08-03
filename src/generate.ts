@@ -1,18 +1,19 @@
 import { info } from "./util/type";
-import { exec } from 'shelljs'
+import execa from 'execa'
 import { render as DVTemplate } from './template/dv'
 import { render as OVTemplate } from './template/ov'
 import { render as EVTemplate } from './template/ev'
 import { write, tmpDir } from "./util/file";
 import random from "./util/random";
 import { join } from "path";
-import { existsSync, mkdirSync, readFileSync, rmSync } from "fs";
+import { existsSync } from "fs";
+import { mkdir, readFile, rm } from "fs/promises";
 import config from "./config";
 
-export function generate(info: info) {
+export async function generate(info: info) {
     const sign = random()
     const generateDir = join(tmpDir, sign)
-    if (!existsSync(generateDir)) mkdirSync(generateDir)
+    if (!existsSync(generateDir)) await mkdir(generateDir)
     try {
         switch (info.validationLevel) {
             case "DV":
@@ -32,18 +33,18 @@ export function generate(info: info) {
         }
         const configCnfDir = join(generateDir, "config.cnf")
         const keyPemDir = join(generateDir, "key.pem")
-        exec(["openssl", "genrsa", "-out", keyPemDir, "2048"].join(" "), { silent: true })
+        await execa("openssl", ["genrsa", "-out", keyPemDir, "2048"])
         const csrPemdir = join(generateDir, "csr.pem")
-        exec(`openssl req -config ${configCnfDir} -key ${keyPemDir} -new -utf8 ${"-" + info.signatureHashingAlgorithm.toLowerCase()} -out ${csrPemdir}`, { silent: true })
+        await execa("openssl", ["req", "-config", configCnfDir, "-key", keyPemDir, "-new", "-utf8", "-" + info.signatureHashingAlgorithm.toLowerCase(), "-out", csrPemdir])
         const CACnfDir = config.filter(item => item.name === info.CAName)[0].path
         const certPemDir = join(generateDir, "cert.pem")
-        exec(["openssl", "ca", "-config", CACnfDir, "-extensions", "server_cert", "-days",
+        await execa("openssl", ["ca", "-config", CACnfDir, "-extensions", "server_cert", "-days",
             info.validityPeriod, "-notext", "-utf8", "-md",
-            info.signatureHashingAlgorithm.toLowerCase(), "-in", csrPemdir, "-out", certPemDir, "-batch"].join(" "), { silent: true })
+            info.signatureHashingAlgorithm.toLowerCase(), "-in", csrPemdir, "-out", certPemDir, "-batch"])
         const powerCaCertPemDir = join(CACnfDir.replace("powerca.cnf", ""), "certs", "powerca.cert.pem")
-        const certPem = readFileSync(certPemDir).toString()
-        const keyPem = readFileSync(keyPemDir).toString()
-        const powerCaCertPem = readFileSync(powerCaCertPemDir).toString()
+        const certPem = (await readFile(certPemDir)).toString()
+        const keyPem = (await readFile(keyPemDir)).toString()
+        const powerCaCertPem = (await readFile(powerCaCertPemDir)).toString()
         return {
             certPem,
             keyPem,
@@ -52,6 +53,6 @@ export function generate(info: info) {
     } catch (_) {
         return "Unknown Error"
     } finally {
-        if (existsSync(generateDir)) rmSync(generateDir, { recursive: true })
+        if (existsSync(generateDir)) await rm(generateDir, { recursive: true })
     }
 }

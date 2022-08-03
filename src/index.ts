@@ -8,12 +8,12 @@ let app = express()
 
 app.use(cors())
 
-app.post('/', jsonParser(), (req: Request, res: Response) => {
+app.post('/', jsonParser(), async (req: Request, res: Response) => {
     const validate = filter(req.body)
     if (typeof (validate) === 'string') {
         res.status(400).json({ message: validate })
     } else {
-        const data = generate(validate)
+        const data = await generate(validate)
         if (typeof (data) === "string") {
             res.status(500).json({ message: data })
         } else {
