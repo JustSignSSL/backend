@@ -1,17 +1,19 @@
 import { CAdir } from "./util/file"
 import { join } from "path"
-import { config, CAType } from './util/type'
+import { CA, CAType, config } from './util/type'
 import { readFileSync } from "fs"
 import { projDir } from "./util/file"
 
 const cnfDir = (name: string) => join(CAdir, name, 'powerca.cnf')
 
-const filter = (config: config[]): config[] => {
+const filter = (config: CA[]): CA[] => {
     config.forEach(item => item.path = cnfDir(item.path).replace("//", "/"))
     return config
 }
 
-const list: config[] = JSON.parse(readFileSync(join(projDir, "src", "config.json")).toString())
+const config: config = JSON.parse(readFileSync(join(projDir, "src", "config.json")).toString())
+
+const list: CA[] = config.CA
 
 export default filter(list)
 

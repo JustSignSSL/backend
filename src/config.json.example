@@ -1,7 +1,10 @@
-[
-    {
-        "name": "Some Inc.",
-        "CAType": "DV",
-        "path": "path, for example test => projectDir/backend/CA/test"
-    }
-]
+{
+    "debug": false,
+    "CA": [
+        {
+            "name": "Some Inc.",
+            "CAType": "DV",
+            "path": "path, for example test => projectDir/backend/CA/test"
+        }
+    ]
+}
