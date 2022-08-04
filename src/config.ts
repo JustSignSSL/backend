@@ -15,6 +15,8 @@ const config: config = JSON.parse(readFileSync(join(projDir, "src", "config.json
 
 export const isDev = config.debug
 
+export const origin = config.origin
+
 const list: CA[] = config.CA
 
 export default filter(list)

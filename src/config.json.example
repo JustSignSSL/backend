@@ -6,5 +6,6 @@
             "CAType": "DV",
             "path": "path, for example test => projectDir/backend/CA/test"
         }
-    ]
+    ],
+    "origin": "*"
 }

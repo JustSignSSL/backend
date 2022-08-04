@@ -2,13 +2,14 @@ import express, { Request, Response } from 'express'
 import filter from './filter'
 import { generate } from './generate'
 import { json as jsonParser } from 'body-parser'
-import cors from 'cors'
+import cors from './middleware/cors'
 
 let app = express()
 
 app.use(cors())
+app.use(jsonParser())
 
-app.post('/', jsonParser(), async (req: Request, res: Response) => {
+app.post('/', async (req: Request, res: Response) => {
     const validate = filter(req.body)
     if (typeof (validate) === 'string') {
         res.status(400).json({ message: validate })
@@ -20,10 +21,6 @@ app.post('/', jsonParser(), async (req: Request, res: Response) => {
             res.status(200).json({ message: 'success', data })
         }
     }
-})
-
-app.post('/test', jsonParser(), (req, res) => {
-    res.send(req.body)
 })
 
 app.listen(3000, () => {
