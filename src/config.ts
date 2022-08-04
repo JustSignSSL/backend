@@ -13,6 +13,8 @@ const filter = (config: CA[]): CA[] => {
 
 const config: config = JSON.parse(readFileSync(join(projDir, "src", "config.json")).toString())
 
+export const isDev = config.debug
+
 const list: CA[] = config.CA
 
 export default filter(list)

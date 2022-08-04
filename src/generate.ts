@@ -1,5 +1,5 @@
 import { info } from "./util/type";
-import execa from 'execa'
+import exec from "./util/exec";
 import { render as DVTemplate } from './template/dv'
 import { render as OVTemplate } from './template/ov'
 import { render as EVTemplate } from './template/ev'
@@ -8,7 +8,7 @@ import random from "./util/random";
 import { join } from "path";
 import { existsSync } from "fs";
 import { mkdir, readFile, rm } from "fs/promises";
-import config from "./config";
+import config, { isDev } from "./config";
 
 export async function generate(info: info) {
     const sign = random()
@@ -33,12 +33,12 @@ export async function generate(info: info) {
         }
         const configCnfDir = join(generateDir, "config.cnf")
         const keyPemDir = join(generateDir, "key.pem")
-        await execa("openssl", ["genrsa", "-out", keyPemDir, "2048"])
+        await exec("openssl", ["genrsa", "-out", keyPemDir, "2048"])
         const csrPemdir = join(generateDir, "csr.pem")
-        await execa("openssl", ["req", "-config", configCnfDir, "-key", keyPemDir, "-new", "-utf8", "-" + info.signatureHashingAlgorithm.toLowerCase(), "-out", csrPemdir])
+        await exec("openssl", ["req", "-config", configCnfDir, "-key", keyPemDir, "-new", "-utf8", "-" + info.signatureHashingAlgorithm.toLowerCase(), "-out", csrPemdir])
         const CACnfDir = config.filter(item => item.name === info.CAName)[0].path
         const certPemDir = join(generateDir, "cert.pem")
-        await execa("openssl", ["ca", "-config", CACnfDir, "-extensions", "server_cert", "-days",
+        await exec("openssl", ["ca", "-config", CACnfDir, "-extensions", "server_cert", "-days",
             info.validityPeriod, "-notext", "-utf8", "-md",
             info.signatureHashingAlgorithm.toLowerCase(), "-in", csrPemdir, "-out", certPemDir, "-batch"])
         const powerCaCertPemDir = join(CACnfDir.replace("powerca.cnf", ""), "certs", "powerca.cert.pem")
@@ -53,6 +53,6 @@ export async function generate(info: info) {
     } catch (_) {
         return "Unknown Error"
     } finally {
-        if (existsSync(generateDir)) await rm(generateDir, { recursive: true })
+        if (existsSync(generateDir) && !isDev) await rm(generateDir, { recursive: true })
     }
 }
