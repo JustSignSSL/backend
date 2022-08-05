@@ -19,6 +19,8 @@ export const origin = config.origin
 
 const list: CA[] = config.CA
 
+export const port = config.port
+
 export default filter(list)
 
 export const getValidCA = (type: CAType): string[] => {

@@ -31,5 +31,6 @@ export interface info {
 export type config = {
     debug: boolean,
     CA: CA[],
-    origin: string[] | "*"
+    origin: string[] | "*",
+    port: number
 }

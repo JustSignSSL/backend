@@ -3,6 +3,7 @@ import filter from './filter'
 import { generate } from './generate'
 import { json as jsonParser } from 'body-parser'
 import cors from './middleware/cors'
+import { port } from './config'
 
 let app = express()
 
@@ -23,6 +24,6 @@ app.post('/', async (req: Request, res: Response) => {
     }
 })
 
-app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000")
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`)
 })
