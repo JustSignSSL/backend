@@ -5,7 +5,7 @@ import { render as OVTemplate } from './template/ov'
 import { render as EVTemplate } from './template/ev'
 import { write, tmpDir } from "./util/file";
 import random from "./util/random";
-import { join } from "path";
+import join from "./util/join";
 import { existsSync } from "fs";
 import { mkdir, readFile, rm } from "fs/promises";
 import config, { isDev } from "./config";
