@@ -7,5 +7,6 @@
             "path": "path, for example test => projectDir/backend/CA/test"
         }
     ],
-    "origin": "*"
+    "origin": "*",
+    "port": 3000
 }
