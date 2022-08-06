@@ -32,8 +32,8 @@ const OVSchema = Object.assign({}, DVSchema, {
 const EVSchema = Object.assign({}, OVSchema, {
     serialNumber: joi.string().regex(/^[A-Z\d]+$/),
     businessCategory: joi.string().valid("Private Organization", "Government Entity").required(),
-    jurisdictionLocalityName: joi.string().max(30).required(),
-    jurisdictionStateOrProvinceName: joi.string().max(30).required(),
+    jurisdictionLocalityName: [joi.string().max(30), joi.string().allow("")],
+    jurisdictionStateOrProvinceName: [joi.string().max(30), joi.string().allow("")],
     jurisdictionCountryName: joi.string().valid(...ISO3166).required(),
     CAName: joi.string().valid(...getValidCA("EV")).required(),
     commonName: [
@@ -43,7 +43,9 @@ const EVSchema = Object.assign({}, OVSchema, {
     altName: joi.array().items(
         joi.string().domain(),
         joi.string().ip({ version: ['ipv4', 'ipv6'] }),
-    )
+    ),
+    postalCode: [joi.string(), joi.number(), joi.string().allow("")],
+    streetAddress: [joi.string(),joi.string().allow("")]
 })
 
 const schemaList = {
@@ -58,7 +60,8 @@ let infoMap = {
         'countryName', 'stateOrProvinceName', 'localityName', 'organizationName'],
     "EV": ['validationLevel', 'commonName', 'CAName', 'validityPeriod', 'signatureHashingAlgorithm', 'altName',
         'countryName', 'stateOrProvinceName', 'localityName', 'organizationName',
-        'serialNumber', 'businessCategory', 'jurisdictionLocalityName', 'jurisdictionStateOrProvinceName', 'jurisdictionCountryName'],
+        'serialNumber', 'businessCategory', 'jurisdictionLocalityName', 'jurisdictionStateOrProvinceName',
+        'jurisdictionCountryName', 'postalCode', 'streetAddress'],
 }
 
 export default function (obj: Partial<info>): output {

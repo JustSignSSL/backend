@@ -1,12 +1,22 @@
 import { formatSubjectAltName } from "./format"
 
-export const render = (
+type args = {
     commonName: string,
     altName: Array<string>,
     countryName: string,
     stateOrProvinceName: string,
     localityName: string,
     organizationName: string
+}
+
+export const render = (
+    { commonName,
+        altName,
+        countryName,
+        stateOrProvinceName,
+        localityName,
+        organizationName
+    }: args
 ) => {
     let template = `[ req ]
 prompt = no

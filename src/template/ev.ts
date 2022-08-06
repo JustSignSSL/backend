@@ -1,6 +1,6 @@
-import { formatSubjectAltName } from "./format"
+import { formatSubjectAltName, optional } from "./format"
 
-export const render = (
+type args = {
     commonName: string,
     altName: Array<string>,
     countryName: string,
@@ -11,7 +11,26 @@ export const render = (
     jurisdictionStateOrProvinceName: string,
     jurisdictionCountryName: string,
     serialNumber: string,
-    businessCategory: string
+    businessCategory: string,
+    postalCode: string,
+    streetAddress: string
+}
+
+export const render = (
+    { commonName,
+        altName,
+        countryName,
+        stateOrProvinceName,
+        localityName,
+        organizationName,
+        jurisdictionLocalityName,
+        jurisdictionStateOrProvinceName,
+        jurisdictionCountryName,
+        serialNumber,
+        businessCategory,
+        postalCode,
+        streetAddress,
+    }: args
 ) => {
     let template = `[ req ]
 prompt = no
@@ -31,6 +50,8 @@ businessCategory = ${businessCategory}
 jurisdictionLocalityName = ${jurisdictionLocalityName}
 jurisdictionStateOrProvinceName = ${jurisdictionStateOrProvinceName}
 jurisdictionCountryName = ${jurisdictionCountryName}
+${optional("postalCode", postalCode)}
+${optional("streetAddress", streetAddress)}
 [ v3_req ]
 subjectAltName = ${formatSubjectAltName(commonName)}`
     altName.forEach(item => template += `,${formatSubjectAltName(item)}`)

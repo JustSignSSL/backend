@@ -1,6 +1,10 @@
 import { formatSubjectAltName } from "./format"
 
-export const render = (commonName: string, altName: Array<string>) => {
+type args = {
+    commonName: string, altName: Array<string>
+}
+
+export const render = ({ commonName, altName }: args) => {
     let template = `[ req ]
 prompt = no
 default_bits = 2048

@@ -1,4 +1,4 @@
-import { info } from "./util/type";
+import { CAType, info } from "./util/type";
 import exec from "./util/exec";
 import { render as DVTemplate } from './template/dv'
 import { render as OVTemplate } from './template/ov'
@@ -10,27 +10,22 @@ import { existsSync } from "fs";
 import { mkdir, readFile, rm } from "fs/promises";
 import config, { isDev } from "./config";
 
+const getTemplate = (type: CAType) => {
+    let map = {
+        "DV": DVTemplate,
+        "OV": OVTemplate,
+        "EV": EVTemplate
+    }
+    return map[type]
+}
+
+
 export async function generate(info: info) {
     const sign = random()
     const generateDir = join(tmpDir, sign)
     if (!existsSync(generateDir)) await mkdir(generateDir)
     try {
-        switch (info.validationLevel) {
-            case "DV":
-                write(DVTemplate(info.commonName, info.altName), generateDir, "config.cnf")
-                break;
-            case "OV":
-                write(OVTemplate(info.commonName, info.altName, info.countryName!,
-                    info.stateOrProvinceName!, info.localityName!, info.organizationName!),
-                    generateDir, "config.cnf")
-                break;
-            case "EV":
-                write(EVTemplate(info.commonName, info.altName, info.countryName!,
-                    info.stateOrProvinceName!, info.localityName!, info.organizationName!,
-                    info.jurisdictionLocalityName!, info.jurisdictionStateOrProvinceName!,
-                    info.jurisdictionCountryName!, info.serialNumber!, info.businessCategory!), generateDir, "config.cnf")
-                break;
-        }
+        write(getTemplate(info.validationLevel)(info as any), generateDir, "config.cnf")
         const configCnfDir = join(generateDir, "config.cnf")
         const keyPemDir = join(generateDir, "key.pem")
         await exec("openssl", ["genrsa", "-out", keyPemDir, "2048"])
@@ -50,7 +45,8 @@ export async function generate(info: info) {
             keyPem,
             powerCaCertPem
         }
-    } catch (_) {
+    } catch (e) {
+        console.log(e)
         return "Unknown Error"
     } finally {
         if (existsSync(generateDir) && !isDev) await rm(generateDir, { recursive: true })
