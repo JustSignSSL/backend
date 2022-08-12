@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "start:dev": "nodemon bin"
+    "start:dev": "nodemon bin",
+    "start": "node bin"
   },
   "keywords": [],
   "author": "",
